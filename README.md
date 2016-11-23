@@ -11,3 +11,7 @@ To run web application:
   ```sh
 $ python web.py
 ```
+
+#### Enjoy!!!
+
+![alt tag](https://raw.githubusercontent.com/vitaliylevitskiand/ansiart/master/static/einstein.png)

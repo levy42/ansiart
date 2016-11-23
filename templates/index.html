@@ -13,7 +13,7 @@
     <div class="container-fluid">
         <div class="navbar-header">
             <a href="/"> <img href="/" alt="Brand"
-                              style="height: 30px; margin-top: 10px"
+                              style="height: 25px; margin-top: 10px"
                               src="/static/logo.png"></a>
             </a>
         </div>
@@ -54,13 +54,13 @@
     <div class="container">
         {% if image and inverse %}
             <h4>Link to this picture<a target="_blank"
-                                       href="{{ "/view/" + link + "?i=true" }}">
+                                       href="{{ "view/" + link + "?i=true" }}">
                 here</a></h4>
             <pre style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
         {% endif %}
         {% if image and not inverse %}
             <h4>Link to this picture<a target="_blank"
-                                       href="{{ "/view/" + link }}"> here</a></h4>
+                                       href="{{ "view/" + link }}"> here</a></h4>
             <pre style="font-size: x-small">{{ image }}</pre>
         {% endif %}
     </div>
