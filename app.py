@@ -45,7 +45,8 @@ def create_picture():
             image = art.get_art(filepath, size=size,
                                 inverse=inverse,
                                 palette=art.PALETTE_MAP[palette])
-            file(os.path.join(PICTURE_FOLDER, filename), 'w').write(image)
+            file(os.path.join(PICTURE_FOLDER, filename), 'w').write(
+                image.encode("UTF-8"))
         except Exception as e:
             LOG.error("Failed to create ANSI picture. Reason: %s" % e)
             error = "Failed to create ANSI picture. Check your image file"
