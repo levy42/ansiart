@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ANSI ART</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="/"> <img href="/" alt="Brand"
+                              style="height: 25px; margin-top: 10px"
+                              src="/static/logo.png"></a>
+        </div>
+        <div class="collapse navbar-collapse"
+             id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                       role="button" aria-expanded="false">Укр</a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="/">Eng</a></li>
+                        <li><a href="/ru">Рус</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+    <h4>Інструмент для створення ANSI картинок</h4>
+    <form class="form-inline well" style="margin: 10px" action="/ua/upload"
+          id="main"
+          method="POST"
+          enctype="multipart/form-data">
+        <h4>Завантажити файл: (.jpg, .png, .jpeg)</h4>
+        <span class="btn btn-default btn-file"><input type="file" name="file"></span>
+        <div class="form-group">
+            <label for="sel1">Розмір</label>
+            <select class="form-control" id="sel1" name="size">
+                {% for opt_name, opt_value in sizes %}
+                    <option value="{{ opt_value }}">{{ opt_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="sel2">Палітра</label>
+            <select class="form-control" id="sel2" name="palette">
+                {% for opt in palettes %}
+                    <option {% if opt == 'Default' %}selected{% endif %}>{{ opt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="inv" data-toggle="tooltip"
+                   title="Білі символи на чорному фоні">Інверсія</label>
+            <input id="inv" type="checkbox" name="inverse" checked>
+        </div>
+        <input class="btn btn-danger" type="submit" value="Створити!"
+               style="margin-left: 20px">
+    </form>
+
+    <div class="container">
+        {% if image and inverse %}
+            <h4>Посилання на картинку <a target="_blank"
+                                         href="{{ "view/" + link + "?i=true" }}">
+                ТУТ</a></h4>
+            <pre style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
+        {% endif %}
+        {% if image and not inverse %}
+            <h4>Посилання на картинку <a target="_blank"
+                                         href="{{ "view/" + link }}"> ТУТ</a>
+            </h4>
+            <pre style="font-size: x-small">{{ image }}</pre>
+        {% endif %}
+    </div>
+    {% if error %}
+        <div class="alert alert-danger">
+            <strong>Помилка!</strong> Неможливо створити картинку, перевірте
+            зображення!
+        </div>
+    {% endif %}
+</div>
+</body>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+</html>

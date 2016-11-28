@@ -7,8 +7,8 @@ DEFAULT = ['  ', '. ', '..', '.-', '--', '-+', '++', '**', 'HH', 'H#', '##']
 PALETTE_MAP = {'Default': DEFAULT}
 try:
     PALETTE_MAP.update(json.loads(file("palette.json").read()))
-except:
-    pass
+except Exception:
+    print("Failed to load palettes")
 
 
 def get_art(path, size=SIZE, inverse=True, palette=DEFAULT):
@@ -31,7 +31,7 @@ def get_art(path, size=SIZE, inverse=True, palette=DEFAULT):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-            description='Tool for generating ANSI pictures.')
+        description='Tool for generating ANSI pictures.')
     parser.add_argument('path', help='path to image (.png, .jpg or .jpeg)')
     parser.add_argument('--size', type=int, nargs='?',
                         help='size of picture to be generated, default: 60',
@@ -46,4 +46,4 @@ if __name__ == '__main__':
     args = parser.parse_args().__dict__
     if args.get('palette'):
         args['palette'] = PALETTE_MAP[args['palette']]
-    print get_art(**args)
+    print(get_art(**args))
