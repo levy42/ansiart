@@ -20,6 +20,7 @@
     </div>
 </nav>
 <div class="container">
+    <h4>Tool for generating ANSI pictures from images</h4>
     <form class="form-inline well" style="margin: 10px" action="/upload"
           id="main"
           method="POST"
@@ -38,7 +39,7 @@
             <label for="sel2">Palette</label>
             <select class="form-control" id="sel2" name="palette">
                 {% for opt in palettes %}
-                    <option>{{ opt }}</option>
+                    <option {% if opt == 'Default' %}selected{% endif %}>{{ opt }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -60,7 +61,8 @@
         {% endif %}
         {% if image and not inverse %}
             <h4>Link to this picture<a target="_blank"
-                                       href="{{ "view/" + link }}"> here</a></h4>
+                                       href="{{ "view/" + link }}"> here</a>
+            </h4>
             <pre style="font-size: x-small">{{ image }}</pre>
         {% endif %}
     </div>

@@ -1,9 +1,11 @@
-import os, sys
+import os
 import uuid
+import logging
 from flask import Flask, render_template, request
 import ansiart as art
-import logging
 
+SERVER_KEY = '1' if not os.path.exists('server-key.txt') else file(
+        'server-key.txt').read()
 UPLOAD_FOLDER = 'uploads'
 PICTURE_FOLDER = 'pictures'
 
@@ -17,7 +19,7 @@ LOG.setLevel(logging.INFO)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 
-PALETTES = art.PALETTE_MAP.keys()
+PALETTES = sorted(art.PALETTE_MAP.keys())
 SIZES = [('x-small', 30), ('small', 50), ('medium', 70), ('large', 90),
          ('x-large', 120)]
 
@@ -35,8 +37,6 @@ def create_picture():
         size = int(request.form['size'])
         inverse = True if request.form.get('inverse') else False
         palette = request.form['palette']
-        image = None
-        error = None
         LOG.info("New request. Params: %s" % [size, inverse, palette])
         filename = str(uuid.uuid4())
         filepath = os.path.join(UPLOAD_FOLDER, filename)
@@ -46,20 +46,24 @@ def create_picture():
                                 inverse=inverse,
                                 palette=art.PALETTE_MAP[palette])
             file(os.path.join(PICTURE_FOLDER, filename), 'w').write(
-                image.encode("UTF-8"))
+                    image.encode("UTF-8"))
         except Exception as e:
             LOG.error("Failed to create ANSI picture. Reason: %s" % e)
             error = "Failed to create ANSI picture. Check your image file"
+            return render_template("index.html", sizes=SIZES,
+                                   palettes=PALETTES, error=error)
         os.remove(filepath)
+        link = "%s/%s" % (SERVER_KEY, filename)
         return render_template("index.html", image=image, inverse=inverse,
                                sizes=SIZES,
-                               palettes=PALETTES, link=filename,
-                               error=error)
+                               palettes=PALETTES, link=link)
 
 
-@app.route('/view/<uuid>')
-def get_picture(uuid):
-    image = file(os.path.join(PICTURE_FOLDER, uuid)).read()
+@app.route('/view/<server_key>/<filename>')
+def get_picture(server_key, filename):
+    if server_key != SERVER_KEY:
+        return "", 404
+    image = file(os.path.join(PICTURE_FOLDER, filename)).read()
     inverse = bool(request.args.get('i'))
     return render_template("picture_view.html", image=image, inverse=inverse)
 
