@@ -5,7 +5,7 @@ from flask import Flask, render_template, request
 import ansiart as art
 
 SERVER_KEY = '1' if not os.path.exists('server-key.txt') else file(
-        'server-key.txt').read()
+        'server-key.txt').readline(1)
 UPLOAD_FOLDER = 'uploads'
 PICTURE_FOLDER = 'pictures'
 
