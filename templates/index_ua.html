@@ -7,6 +7,7 @@
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-filestyle.min.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -28,8 +29,8 @@
                     </ul>
                 </li>
             </ul>
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
+        </div>
+    </div>
 </nav>
 <div class="container">
     <h4>Інструмент для створення ANSI картинок</h4>
@@ -37,8 +38,11 @@
           id="main"
           method="POST"
           enctype="multipart/form-data">
-        <h4>Завантажити файл: (.jpg, .png, .jpeg)</h4>
-        <span class="btn btn-default btn-file"><input type="file" name="file"></span>
+        <div class="form-group">
+            <label>Завантажити файл: (.jpg, .png, .jpeg)</label>
+            <input type="file" class="filestyle" name="file"
+                   data-buttonText="">
+        </div>
         <div class="form-group">
             <label for="sel1">Розмір</label>
             <select class="form-control" id="sel1" name="size">

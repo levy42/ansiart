@@ -7,6 +7,7 @@
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap-filestyle.min.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-default">
@@ -37,8 +38,11 @@
           id="main"
           method="POST"
           enctype="multipart/form-data">
-        <h4>Upload file: (.jpg, .png, .jpeg)</h4>
-        <span class="btn btn-default btn-file"><input type="file" name="file"></span>
+        <div class="form-group">
+            <label>Upload file: (.jpg, .png, .jpeg)</label>
+            <input type="file" class="filestyle" name="file"
+                   data-buttonText="">
+        </div>
         <div class="form-group">
             <label for="sel1">Size</label>
             <select class="form-control" id="sel1" name="size">
@@ -60,7 +64,7 @@
                    title="White symbols on the dark background">Inverse</label>
             <input id="inv" type="checkbox" name="inverse" checked>
         </div>
-        <input class="btn btn-danger" type="submit"
+        <input class="btn btn-danger" type="submit" value="Create!"
                style="margin-left: 20px"/>
     </form>
 
