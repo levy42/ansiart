@@ -2,9 +2,10 @@ import os
 import datetime
 import uuid
 import logging
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, g, abort, Blueprint
 from flask_cache import Cache
 from flask_sqlalchemy import SQLAlchemy
+from flask_babel import Babel, _
 import ansiart as art
 
 LOG = logging.getLogger('ANSIArt')
@@ -17,8 +18,11 @@ LOG.setLevel(logging.INFO)
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
+main = Blueprint("main", __name__)
+
 db = SQLAlchemy(app)
 cache = Cache(app, config=app.config)
+babel = Babel(app)
 
 
 class Picture(db.Model):
@@ -42,21 +46,41 @@ SIZES = [('M', 70), ('XS', 30), ('S', 50), ('L', 90),
          ('XL', 120)]
 
 
-@app.route("/<lang>/")
-@app.route("/")
+@babel.localeselector
+def get_locale():
+    return g.get('lang_code', app.config['BABEL_DEFAULT_LOCALE'])
+
+
+@app.url_defaults
+def set_language_code(endpoint, values):
+    if 'lang_code' in values or not g.get('lang_code', None):
+        return
+    if app.url_map.is_endpoint_expecting(endpoint, 'lang_code'):
+        values['lang_code'] = g.lang_code
+
+
+@app.url_value_preprocessor
+def get_lang_code(endpoint, values):
+    if values is not None:
+        g.lang_code = values.pop('lang_code', None)
+
+
+@app.before_request
+def ensure_lang_support():
+    lang_code = g.get('lang_code', None)
+    if lang_code and lang_code not in app.config['SUPPORTED_LANGUAGES'].keys():
+        return abort(404)
+
+
+@main.route("/")
 @cache.cached(timeout=3600)
-def index(lang='en'):
-    if lang not in ['en', 'ua', 'ru']:
-        return "", 404
-    return render_template("index_%s.html" % lang, sizes=SIZES,
+def index():
+    return render_template("index.html", sizes=SIZES,
                            palettes=PALETTES)
 
 
-@app.route('/<lang>/upload', methods=['GET', 'POST'])
-@app.route('/upload', methods=['GET', 'POST'])
-def create_picture(lang='en'):
-    if lang not in ['en', 'ua', 'ru']:
-        return "", 404
+@main.route('/upload', methods=['GET', 'POST'])
+def create_picture():
     if request.method == 'POST':
         f = request.files.get('file')
         size = int(request.form['size'])
@@ -64,7 +88,7 @@ def create_picture(lang='en'):
         palette = request.form['palette']
         LOG.info("New request. Params: %s" % [size, inverse, palette])
         filename = str(uuid.uuid4())
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filepath = os.path.join('/tmp', filename)
         f.save(filepath)
         try:
             image = art.get_art(filepath, size=size,
@@ -76,20 +100,19 @@ def create_picture(lang='en'):
         except Exception as e:
             LOG.error("Failed to create ANSI picture. Reason: %s" % e)
             error = "Failed to create ANSI picture. Check your image file"
-            return render_template("index_en.html", sizes=SIZES,
+            return render_template("index.html", sizes=SIZES,
                                    palettes=PALETTES, error=error)
         os.remove(filepath)
         link = filename
-        return render_template("index_%s.html" % lang, image=image,
+        return render_template("index.html", image=image,
                                inverse=inverse,
                                sizes=SIZES,
                                palettes=PALETTES, link=link)
 
 
-@app.route('/<lang>/view/<id>')
-@app.route('/view/<id>')
+@main.route('/view/<id>')
 @cache.cached(timeout=3600)
-def get_picture(id, lang='en'):
+def get_picture(id):
     picture = Picture.query.get(id)
     if not picture:
         return "", 404
@@ -99,8 +122,7 @@ def get_picture(id, lang='en'):
                            inverse=picture.inverse)
 
 
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.mkdir(app.config['UPLOAD_FOLDER'], 0o755)
-
 LOG.info("ANSIART Started!!!")
+app.register_blueprint(main, url_prefix="/<lang_code>")
+app.register_blueprint(main, url_prefix="/")
 app.run(port=4000, host='0.0.0.0')
