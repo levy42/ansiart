@@ -1,9 +1,9 @@
-import os
 import datetime
-import uuid
+import os
 import logging
-from flask import Flask, render_template, request, abort, Blueprint, session, \
-    redirect
+import uuid
+from flask import Flask, Blueprint
+from flask import render_template, request, abort, session, redirect
 from flask_cache import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_babel import Babel, _
@@ -54,14 +54,25 @@ def get_locale():
 
 @app.url_value_preprocessor
 def get_lang_code(endpoint, values):
+    if endpoint == 'static':
+        return
     if values is not None:
         lang_code = values.pop('lang_code', None)
-        if not lang_code and session.get('lang_code'):
-            return redirect("/%s/%s" % (session.get('lang_code'), endpoint))
+        session['redirected'] = lang_code is not None
         if lang_code and lang_code not in app.config[
             'SUPPORTED_LANGUAGES'].keys():
             return abort(404)
-        session['lang_code'] = lang_code
+        if lang_code:
+            session['lang_code'] = lang_code
+
+
+@app.before_request
+def locale_redirect():
+    if request.script_root == "/static":
+        return
+    if not session.get('redirected') and session.get('lang_code'):
+        session['redirected'] = True
+        return redirect("/%s" % (session.get('lang_code') or ""))
 
 
 @main.route('/')
@@ -91,8 +102,8 @@ def create_picture():
             db.session.commit()
         except Exception as e:
             LOG.error(
-                    _("Failed to create ANSI picture. Reason: %(error)s",
-                      error=e))
+                _("Failed to create ANSI picture. Reason: %(error)s",
+                  error=e))
             error = _("Failed to create ANSI picture. Check your image file")
             return render_template("index.html", sizes=SIZES,
                                    palettes=PALETTES, error=error)
@@ -107,7 +118,6 @@ def create_picture():
 @main.route('/view/<id>')
 @cache.cached(timeout=3600)
 def get_picture(id):
-    raise Exception
     picture = Picture.query.get(id)
     if not picture:
         return "", 404

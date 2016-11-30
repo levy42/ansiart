@@ -53,7 +53,7 @@ msgid "Error"
 msgstr "Ошибка"
 
 msgid "Russian"
-msgstr "Російська"
+msgstr "Русский"
 
 msgid "Page not found"
 msgstr "Страницу не найдено"

@@ -1,17 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>ANSI art generator</title>
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Error{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
 <div class="container h1" style="text-align: center; margin-top: 10%">
     <div>{{ _('Oooops, something goes wrong') }} :(</div>
-    <a class="btn btn-success" href="/{{ g.lang_code }}">{{ _('Home') }}</a>
+    <a class="btn btn-danger" href="/{{ session.lang_code or "" }}">{{ _('Home') }}</a>
 </div>
-</body>
-</html>
+{% endblock %}

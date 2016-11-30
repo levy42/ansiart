@@ -1,105 +1,99 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>ANSI art generator</title>
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-filestyle/1.2.1/bootstrap-filestyle.min.js"></script>
-</head>
-<body>
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a href="/"> <img href="/" alt="Brand"
-                              style="height: 25px; margin-top: 10px"
-                              src="/static/logo.png"></a>
-        </div>
-        <div class="collapse navbar-collapse"
-             id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a class="nav-link dropdown-toggle"
-                       data-toggle="dropdown" aria-haspopup="true"
-                       aria-expanded="false">
-                        {{ (session.lang_code or 'en') }}
-                    </a>
-                    <ul class="dropdown-menu"
-                        aria-labelledby="navbarDropdownMenuLink">
-                        {% for lang_code, lang in config.SUPPORTED_LANGUAGES.items() %}
-                            {% if  (session.lang_code or 'en')!=lang_key %}
-                                <li><a href="/{{ _(lang_code) }}">{{ _(lang) }}</a></li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                </li>
-            </ul>
-        </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-</nav>
-<div class="container">
-    <h4>{{ _('Tool for generating ANSI pictures from images') }}</h4>
-    <form class="form-inline well" style="margin: 10px"
-          action="{{ '/%s/upload' % session.lang_code or 'en' }}"
-          id="main"
-          method="POST"
-          enctype="multipart/form-data">
-        <div class="form-group">
-            <label>Upload file: (.jpg, .png, .jpeg)</label>
-            <input type="file" class="filestyle" name="file"
-                   data-buttonText="">
-        </div>
-        <div class="form-group">
-            <label for="sel1">{{ _('Size') }}</label>
-            <select class="form-control" id="sel1" name="size">
-                {% for opt_name, opt_value in sizes %}
-                    <option value="{{ opt_value }}">{{ _(opt_name) }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="sel2">{{ _('Palette') }}</label>
-            <select class="form-control" id="sel2" name="palette">
-                {% for opt in palettes %}
-                    <option {% if opt == 'Default' %}selected{% endif %}>{{ _(opt) }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="inv" data-toggle="tooltip"
-                   title="{{ _('White symbols on the dark background') }}">{{ _('Inverse') }}</label>
-            <input id="inv" type="checkbox" name="inverse" checked>
-        </div>
-        <input class="btn btn-danger" type="submit" value="{{ _('Create') }}!"
-               style="margin-left: 20px"/>
-    </form>
-
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a href="/"> <img href="/" alt="Brand"
+                                  style="height: 25px; margin-top: 10px"
+                                  src="/static/img/logo.png"></a>
+            </div>
+            <div class="collapse navbar-collapse"
+                 id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           data-toggle="dropdown">
+                            {{ (session.lang_code or config['BABEL_DEFAULT_LOCALE']) }}
+                        </a>
+                        <ul class="dropdown-menu"
+                            aria-labelledby="navbarDropdownMenuLink">
+                            {% for lang_code, lang in config.SUPPORTED_LANGUAGES.items() %}
+                                {% if  (session.lang_code or config['BABEL_DEFAULT_LOCALE'])!=lang_code %}
+                                    <li><a href="/{{ lang_code }}"><span
+                                            class="flag flag-{{ lang_code }}"></span> {{ lang }}
+                                    </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
     <div class="container">
-        {% if image and inverse %}
-            <h4>{{ _('Link to this picture') }}<a target="_blank"
-                                                  href="{{ "view/" + link + "?i=true" }}">
-                {{ _('here') }}</a></h4>
-            <pre style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
-        {% endif %}
-        {% if image and not inverse %}
-            <h4>{{ _('Link to this picture') }}<a target="_blank"
-                                                  href="{{ "view/" + link }}"> {{ _('here') }}</a>
-            </h4>
-            <pre style="font-size: x-small">{{ image }}</pre>
+        <h4>{{ _('Tool for generating ANSI pictures from images') }}</h4>
+        <form class="form-inline well" style="margin: 10px"
+              action="{{ '/%s/upload' % session.lang_code or config['BABEL_DEFAULT_LOCALE'] }}"
+              id="main"
+              method="POST"
+              enctype="multipart/form-data">
+            <div class="form-group">
+                <label>{{ _('Upload file') }}: (.jpg, .png, .jpeg)</label>
+                <input id="file" type="file" class="filestyle" name="file"
+                       data-buttonText="">
+            </div>
+            <div class="form-group">
+                <label for="sel1">{{ _('Size') }}</label>
+                <select class="form-control" id="sel1" name="size">
+                    {% for opt_name, opt_value in sizes %}
+                        <option value="{{ opt_value }}">{{ _(opt_name) }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sel2">{{ _('Palette') }}</label>
+                <select class="form-control" id="sel2" name="palette">
+                    {% for opt in palettes %}
+                        <option {% if opt == 'Default' %}selected{% endif %}>{{ _(opt) }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="inv" data-toggle="tooltip"
+                       title="{{ _('White symbols on the dark background') }}">{{ _('Inverse') }}</label>
+                <input id="inv" type="checkbox" name="inverse" checked>
+            </div>
+            <input class="btn btn-danger" type="submit"
+                   value="{{ _('Create') }}!"
+                   style="margin-left: 20px"/>
+        </form>
+        <div class="container"><img id="img" src="#"
+                                    style="visibility: hidden; width: 150pt"
+                                    alt="Error, not image"/></div>
+
+        <div class="container">
+            {% if image and inverse %}
+                <h4>{{ _('Link to this picture') }}<a target="_blank"
+                                                      href="{{ "view/" + link + "?i=true" }}">
+                    {{ _('here') }}</a></h4>
+                <pre style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
+            {% endif %}
+            {% if image and not inverse %}
+                <h4>{{ _('Link to this picture') }}<a target="_blank"
+                                                      href="{{ "view/" + link }}"> {{ _('here') }}</a>
+                </h4>
+                <pre style="font-size: x-small">{{ image }}</pre>
+            {% endif %}
+        </div>
+        {% if error %}
+            <div class="alert alert-danger">
+                <strong>{{ _('Error') }}!</strong> {{ _(error) }}
+            </div>
         {% endif %}
     </div>
-    {% if error %}
-        <div class="alert alert-danger">
-            <strong>{{ _('Error') }}!</strong> {{ _(error) }}
-        </div>
-    {% endif %}
-</div>
-</body>
-<script>
-    $(document).ready(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-</script>
-</html>
+{% endblock %}
