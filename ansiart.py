@@ -31,7 +31,7 @@ def get_art(path, size=SIZE, inverse=True, palette=DEFAULT):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Tool for generating ANSI pictures.')
+            description='Tool for generating ANSI pictures.')
     parser.add_argument('path', help='path to image (.png, .jpg or .jpeg)')
     parser.add_argument('--size', type=int, nargs='?',
                         help='size of picture to be generated, default: 60',

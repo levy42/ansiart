@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -9,13 +9,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div class="container">
-    {% if image and inverse %}
-        <pre style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
-    {% endif %}
-    {% if image and not inverse %}
-        <pre style="font-size: x-small">{{ image }}</pre>
-    {% endif %}
+<div class="container h1" style="text-align: center; margin-top: 10%">
+    <div>{{ _('Oooops, something goes wrong') }} :(</div>
+    <a class="btn btn-success" href="/{{ g.lang_code }}">{{ _('Home') }}</a>
 </div>
 </body>
 </html>

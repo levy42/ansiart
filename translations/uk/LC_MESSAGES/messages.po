@@ -45,3 +45,21 @@ msgstr "тут"
 
 msgid "Link to this picture"
 msgstr "Посилання на картинку"
+
+msgid "Failed to create ANSI picture. Check your image file"
+msgstr "Не вдалось створити ANSI картинку. Перевірте завантажене зображення"
+
+msgid "Error"
+msgstr "Помилка"
+
+msgid "Ukrainian"
+msgstr "Українська"
+
+msgid "Page not found"
+msgstr "Сторінку не знайдено"
+
+msgid "Oooops, something goes wrong"
+msgstr "Ой, щось пішло не так"
+
+msgid "Home"
+msgstr "На головну"
