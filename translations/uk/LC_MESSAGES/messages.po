@@ -68,4 +68,7 @@ msgid "Share"
 msgstr "Розповісти друзям"
 
 msgid 'Create more pictures'
-msgstr 'Створити больше картинок'
+msgstr 'Створити більше картинок'
+
+msgid 'Picture created at'
+msgstr 'Картинку створено на '

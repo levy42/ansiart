@@ -2,6 +2,9 @@
 {% block title %}Index{% endblock %}
 {% block head %}
     {{ super() }}
+    <script src="/static/js/share.js"></script>
+    <script type="text/javascript" src="https://vk.com/js/api/share.js?94"
+            charset="windows-1251"></script>
 {% endblock %}
 {% block content %}
     <nav class="navbar navbar-default">
@@ -38,7 +41,7 @@
     <div class="container">
         <h4>{{ _('Tool for generating ANSI pictures from images') }}</h4>
         <form class="form-inline well" style="margin: 10px"
-              action="{{ '/%s/upload' % session.lang_code or config['BABEL_DEFAULT_LOCALE'] }}"
+              action="{{ '/%s/upload' % (session.lang_code or config['BABEL_DEFAULT_LOCALE']) }}"
               id="main"
               method="POST"
               enctype="multipart/form-data">
@@ -79,8 +82,10 @@
         <div class="container">
             {% if image and inverse %}
                 <h4>{{ _('Link to this picture') }}<a target="_blank"
-                                                      href="{{ "view/" + link + "?i=true" }}">
+                                                      href="{{ "view/" + link + "?i" }}">
                     {{ _('here') }}</a></h4>
+                <span class="h4">{{ _('Share') }}:</span>
+                <span id="vk_share_button"></span>
                 <pre style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
             {% endif %}
             {% if image and not inverse %}
