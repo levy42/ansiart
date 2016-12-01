@@ -1,11 +1,13 @@
 {% extends "base.html" %}
-{% block title %}{% endblock %}
 {% block head %}
     {{ super() }}
-    <meta property="og:image" content="http://ansiart.online/static/img/einstein.png">
+    <meta property="og:image"
+          content="http://ansiart.online/static/img/einstein.png">
     <script src="/static/js/share.js"></script>
     <script type="text/javascript" src="https://vk.com/js/api/share.js?94"
             charset="windows-1251"></script>
+    <link rel="image_src"
+          href="http://ansiart.online/static/img/einstein.png"/>
 {% endblock %}
 {% block content %}
     <nav class="navbar navbar-default">
@@ -85,8 +87,10 @@
                 <h4>{{ _('Link to this picture') }}<a target="_blank"
                                                       href="{{ "view/" + link + "?i" }}">
                     {{ _('here') }}</a></h4>
-                <span class="h4">{{ _('Share') }}:</span>
-                <span id="vk_share_button"></span>
+                {% if session.lang_code in ['ru','uk'] %}
+                    <span class="h4">{{ _('Share') }}:</span>
+                    <span id="vk_share_button"></span>
+                {% endif %}
                 <pre style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
             {% endif %}
             {% if image and not inverse %}
