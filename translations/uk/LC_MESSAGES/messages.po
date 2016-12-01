@@ -63,3 +63,9 @@ msgstr "Ой, щось пішло не так"
 
 msgid "Home"
 msgstr "На головну"
+
+msgid "Share"
+msgstr "Розповісти друзям"
+
+msgid 'Create more pictures'
+msgstr 'Створити больше картинок'
