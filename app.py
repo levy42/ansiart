@@ -1,145 +1,46 @@
-import datetime
-import os
-import logging
-import uuid
-from flask import Flask, Blueprint
-from flask import render_template, request, abort, session, redirect
-from flask_cache import Cache
-from flask_sqlalchemy import SQLAlchemy
-from flask_babel import Babel, _
-import ansiart as art
+import json
+from flask import Flask
+from flask import render_template, request
+from PIL import Image
 
-LOG = logging.getLogger('ANSIArt')
-hdlr = logging.FileHandler('ansiart.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-LOG.addHandler(hdlr)
-LOG.setLevel(logging.INFO)
+app = Flask(__name__, template_folder="./")
 
-app = Flask(__name__)
-app.config.from_pyfile('config.py')
-
-main = Blueprint("main", __name__)
-
-db = SQLAlchemy(app)
-cache = Cache(app, config=app.config)
-babel = Babel(app)
+SIZES = [('M', 70), ('XS', 30), ('S', 50), ('L', 90), ('XL', 120)]
+DEFAULT = ['  ', '. ', '..', '.-', '--', '-+', '++', '**', 'HH', 'H#', '##']
+PALETTES = {'Default': DEFAULT}
+PALETTES.update(json.loads(file("palette.json").read()))
 
 
-class Picture(db.Model):
-    __tablename__ = 'pictures'
-    id = db.Column(db.String, primary_key=True)
-    text = db.Column(db.Text)
-    inverse = db.Column(db.Boolean)
-    created_at = db.Column(db.DATETIME, default=datetime.datetime.now)
-    updated_at = db.Column(db.DATETIME, onupdate=datetime.datetime.now)
-
-    def __init__(self, id, text, inverse=True):
-        self.id = id
-        self.text = text
-        self.inverse = inverse
-        self.created_at = datetime.datetime.now()
-        self.updated_at = datetime.datetime.now()
-
-
-PALETTES = sorted(art.PALETTE_MAP.keys())
-SIZES = [('M', 70), ('XS', 30), ('S', 50), ('L', 90),
-         ('XL', 120)]
-
-
-@babel.localeselector
-def get_locale():
-    return session.get('lang_code', app.config['BABEL_DEFAULT_LOCALE'])
-
-
-@app.url_value_preprocessor
-def get_lang_code(endpoint, values):
-    if endpoint == 'static':
-        return
-    if values is not None:
-        lang_code = values.pop('lang_code', None)
-        session['redirected'] = lang_code is not None
-        if lang_code and lang_code not in app.config[
-            'SUPPORTED_LANGUAGES'].keys():
-            return abort(404)
-        if lang_code:
-            session['lang_code'] = lang_code
-
-
-@app.before_request
-def locale_redirect():
-    if request.script_root == "/static":
-        return
-    if not session.get('redirected') and session.get('lang_code'):
-        session['redirected'] = True
-        return redirect("/%s" % (session.get('lang_code') or ""))
-
-
-@main.route('/')
-@cache.cached(timeout=3600)
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template("index.html", sizes=SIZES,
-                           palettes=PALETTES)
-
-
-@main.route('/upload', methods=['GET', 'POST'])
-def create_picture():
     if request.method == 'POST':
         f = request.files.get('file')
         size = int(request.form['size'])
         inverse = True if request.form.get('inverse') else False
-        palette = request.form['palette']
-        LOG.info(_("New request. Params: %s") % [size, inverse, palette])
-        filename = str(uuid.uuid4())
-        filepath = os.path.join('/tmp', filename)
-        f.save(filepath)
+        palette = PALETTES[request.form['palette']]
         try:
-            image = art.get_art(filepath, size=size,
-                                inverse=inverse,
-                                palette=art.PALETTE_MAP[palette])
-            picture = Picture(filename, image, inverse)
-            db.session.add(picture)
-            db.session.commit()
+            im = Image.open(f)
+            if not inverse:
+                palette = list(reversed(palette))
+                palette.append(palette[-1])
+            shadow_step = 255 / (len(palette) - 1)
+            w_h = float(im.height) / im.width
+            im = im.resize((size, int(size * w_h)))
+            im = im.convert(mode="L")
+            text = ""
+            for i in range(im.height):
+                for j in range(im.width):
+                    p = im.getpixel((j, i))
+                    text += palette[p / shadow_step]
+                text += "\n"
         except Exception as e:
-            LOG.error(
-                    _("Failed to create ANSI picture. Reason: %(error)s",
-                      error=e))
-            error = _("Failed to create ANSI picture. Check your image file")
+            error = "Failed to create ANSI picture. Check your image file"
             return render_template("index.html", sizes=SIZES,
                                    palettes=PALETTES, error=error)
-        os.remove(filepath)
-        link = filename
-        return render_template("index.html", image=image,
-                               inverse=inverse,
-                               sizes=SIZES,
-                               palettes=PALETTES, link=link)
+        return render_template("index.html", image=text, inverse=inverse,
+                               sizes=SIZES, palettes=PALETTES)
+    else:
+        return render_template("index.html", sizes=SIZES, palettes=PALETTES)
 
 
-@main.route('/view/<id>')
-@cache.cached(timeout=3600)
-def get_picture(id):
-    picture = Picture.query.get(id)
-    if not picture:
-        return "", 404
-    db.session.add(picture)
-    db.session.commit()
-    return render_template("picture_view.html", image=picture.text,
-                           inverse=picture.inverse)
-
-
-@app.errorhandler(404)
-def not_found(e):
-    return render_template("404.html")
-
-
-@app.errorhandler(500)
-def server_error(e):
-    return render_template("500.html")
-
-
-if __name__ == '__main__':
-    LOG.info(_("ANSIART Started!!!"))
-    app.register_blueprint(main, url_prefix="/<lang_code>")
-    app.register_blueprint(main)
-    app.run(port=app.config.get('PORT') or 4000,
-            host=app.config.get('HOST') or '0.0.0.0')
+app.run(port=4000, host='0.0.0.0')

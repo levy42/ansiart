@@ -1,5 +1,0 @@
-Flask>=0.10
-Flask-Babel2
-Flask-Cache
-Flask-SQLAlchemy
-Pillow>=3.3.0

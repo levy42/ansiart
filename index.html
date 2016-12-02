@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta property="og:image" content="ansiart.online/static/ein.jpg">
+    <title>(-|-) ANSI ART</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-filestyle/1.2.1/bootstrap-filestyle.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-7">
+            <h3><b><span style="color: firebrick">#</span>ANSIART</b> - Tool
+                for generating ANSI pictures from images</h3>
+        </div>
+        <div class="text-right" id="twitter">
+            <style scoped>
+                .share {
+                    margin-top: 20px;
+                    width: 30px;
+                    height: 30px;
+                }
+            </style>
+            <a href="http://vkontakte.ru/share.php"><img class="share"
+                                                         src="static/vk.png"></a>
+            <a href="http://www.facebook.com/sharer.php?s=100"><img
+                    class="share" src="static/fb.png"></a>
+            <a href="http://twitter.com/share"><img class="share"
+                                                    src="static/tw.png"></a>
+        </div>
+    </div>
+    <form class="form-inline well well-sm" style="margin: 10px" action="/"
+          method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Upload file: (.jpg, .png, .gif)</label>
+            <input id="file" type="file" accept=".png,.jpg,.gif"
+                   class="filestyle" name="file"
+                   data-buttonText="">
+        </div>
+        <div class="form-group">
+            <label for="sel1">Size:</label>
+            <select class="form-control" id="sel1" name="size">
+                {% for opt_name, opt_value in sizes %}
+                    <option value="{{ opt_value }}">{{ opt_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="sel2">Palette:</label>
+            <select class="form-control" id="sel2" name="palette">
+                {% for opt,value in palettes.items() %}
+                    <option {% if opt == 'Default' %}selected{% endif %}>{{ opt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="inv">Inverse:</label>
+            <input id="inv" type="checkbox" name="inverse" checked>
+        </div>
+        <input class="btn btn-danger" type="submit"
+               value="Create"
+               style="margin-left: 20px"/>
+    </form>
+
+    {% if image %}
+        <pre style=" font-size: x-small;{% if inverse %}background: black; color: white{% endif %}">{{ image }}</pre>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger">
+            <strong>Error! </strong> {{ error }}
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>
