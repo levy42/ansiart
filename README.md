@@ -14,4 +14,4 @@ $ python web.py
 
 #### Enjoy!!!
 
-![alt tag](https://raw.githubusercontent.com/vitaliylevitskiand/ansiart/master/static/einstein.png)
+![alt tag](https://raw.githubusercontent.com/vitaliylevitskiand/ansiart/master/static/img/einstein.png)
