@@ -102,8 +102,8 @@ def create_picture():
             db.session.commit()
         except Exception as e:
             LOG.error(
-                _("Failed to create ANSI picture. Reason: %(error)s",
-                  error=e))
+                    _("Failed to create ANSI picture. Reason: %(error)s",
+                      error=e))
             error = _("Failed to create ANSI picture. Check your image file")
             return render_template("index.html", sizes=SIZES,
                                    palettes=PALETTES, error=error)
@@ -137,7 +137,9 @@ def server_error(e):
     return render_template("500.html")
 
 
-LOG.info(_("ANSIART Started!!!"))
-app.register_blueprint(main, url_prefix="/<lang_code>")
-app.register_blueprint(main)
-app.run(port=4000, host='0.0.0.0')
+if __name__ == '__main__':
+    LOG.info(_("ANSIART Started!!!"))
+    app.register_blueprint(main, url_prefix="/<lang_code>")
+    app.register_blueprint(main)
+    app.run(port=app.config.get('PORT') or 4000,
+            host=app.config.get('HOST') or '0.0.0.0')
