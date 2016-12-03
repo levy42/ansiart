@@ -34,12 +34,7 @@ function share(destination) {
                                 url = FB_SHARE + image_url;
                             if (destination == 'tw')
                                 url = TWITTER_SHARE;
-                            var win = window.open(url, '_blank');
-                            if (win) {
-                                win.focus();
-                            } else {
-                                alert('Please allow popups for this website');
-                            }
+                            window.open(url, '', 'toolbar=0,status=0,width=626,height=436');
                         }
                         else {
                             alert("Sorry, error occurred")
@@ -56,12 +51,7 @@ function share(destination) {
             url = FB_SHARE + "/static/img/einstein.png";
         if (destination == 'tw')
             url = TWITTER_SHARE;
-        var win = window.open(url, '_blank');
-        if (win) {
-            win.focus();
-        } else {
-            alert('Please allow popups for this website');
-        }
+        window.open(url, '', 'toolbar=0,status=0,width=626,height=436');
     }
 }
 
