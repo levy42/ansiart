@@ -1,13 +1,13 @@
 import datetime
-import os
+import json
 import logging
 import uuid
 from flask import Flask, Blueprint
-from flask import render_template, request, abort, session, redirect
+from flask import render_template, request, session, redirect
 from flask_cache import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_babel import Babel, _
-import ansiart as art
+from PIL import Image
 
 LOG = logging.getLogger('ANSIArt')
 hdlr = logging.FileHandler('ansiart.log')
@@ -31,6 +31,7 @@ class Picture(db.Model):
     id = db.Column(db.String, primary_key=True)
     text = db.Column(db.Text)
     inverse = db.Column(db.Boolean)
+    share_image = db.Column(db.String)
     created_at = db.Column(db.DATETIME, default=datetime.datetime.now)
     updated_at = db.Column(db.DATETIME, onupdate=datetime.datetime.now)
 
@@ -42,7 +43,10 @@ class Picture(db.Model):
         self.updated_at = datetime.datetime.now()
 
 
-PALETTES = sorted(art.PALETTE_MAP.keys())
+SIZE = 30
+DEFAULT = ['  ', '. ', '..', '.-', '--', '-+', '++', '**', 'HH', 'H#', '##']
+PALETTES = {'Default': DEFAULT}
+PALETTES.update(json.loads(file("palette.json").read()))
 SIZES = [('M', 70), ('XS', 30), ('S', 50), ('L', 90),
          ('XL', 120)]
 
@@ -57,49 +61,52 @@ def get_lang_code(endpoint, values):
     if endpoint == 'static':
         return
     if values is not None:
-        lang_code = values.pop('lang_code', None)
+        lang_code = values.get('lang_code', None)
         session['redirected'] = lang_code is not None
-        if lang_code and lang_code not in app.config[
-            'SUPPORTED_LANGUAGES'].keys():
-            return abort(404)
-        if lang_code:
+        if lang_code in app.config['SUPPORTED_LANGUAGES'].keys():
             session['lang_code'] = lang_code
+            values.pop('lang_code')
 
 
 @app.before_request
 def locale_redirect():
-    if request.script_root == "/static":
+    if request.script_root in ["/static"]:
         return
     if not session.get('redirected') and session.get('lang_code'):
         session['redirected'] = True
-        return redirect("/%s" % (session.get('lang_code') or ""))
+        return redirect(
+                "/%s%s" % (session.get('lang_code') or "",
+                           request.path if request.path != "/" else ""))
 
 
-@main.route('/')
-@cache.cached(timeout=3600)
+@main.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template("index.html", sizes=SIZES,
-                           palettes=PALETTES)
-
-
-@main.route('/upload', methods=['GET', 'POST'])
-def create_picture():
     if request.method == 'POST':
         f = request.files.get('file')
         size = int(request.form['size'])
         inverse = True if request.form.get('inverse') else False
-        palette = request.form['palette']
+        palette = PALETTES.get(request.form['palette'], DEFAULT)
         LOG.info(_("New request. Params: %s") % [size, inverse, palette])
-        filename = str(uuid.uuid4())
-        filepath = os.path.join('/tmp', filename)
-        f.save(filepath)
         try:
-            image = art.get_art(filepath, size=size,
-                                inverse=inverse,
-                                palette=art.PALETTE_MAP[palette])
-            picture = Picture(filename, image, inverse)
+            im = Image.open(f)
+            if not inverse:
+                palette = list(reversed(palette))
+                palette.append(palette[-1])
+            shadow_step = 255 / (len(palette) - 1)
+            w_h = float(im.height) / im.width
+            im = im.resize((size, int(size * w_h)))
+            im = im.convert(mode="L")
+            text = ""
+            for i in range(im.height):
+                for j in range(im.width):
+                    p = im.getpixel((j, i))
+                    text += palette[p / shadow_step]
+                text += "\n"
+            id = str(uuid.uuid4())
+            picture = Picture(id, text, inverse)
             db.session.add(picture)
             db.session.commit()
+            return redirect("/%s/%s" % (get_locale(), id))
         except Exception as e:
             LOG.error(
                     _("Failed to create ANSI picture. Reason: %(error)s",
@@ -107,15 +114,12 @@ def create_picture():
             error = _("Failed to create ANSI picture. Check your image file")
             return render_template("index.html", sizes=SIZES,
                                    palettes=PALETTES, error=error)
-        os.remove(filepath)
-        link = filename
-        return render_template("index.html", image=image,
-                               inverse=inverse,
-                               sizes=SIZES,
-                               palettes=PALETTES, link=link)
+    else:
+        return render_template("index.html", sizes=SIZES,
+                               palettes=PALETTES)
 
 
-@main.route('/view/<id>')
+@main.route('/<id>/')
 @cache.cached(timeout=3600)
 def get_picture(id):
     picture = Picture.query.get(id)
@@ -123,8 +127,29 @@ def get_picture(id):
         return "", 404
     db.session.add(picture)
     db.session.commit()
-    return render_template("picture_view.html", image=picture.text,
-                           inverse=picture.inverse)
+    return render_template("index.html", image=picture.text,
+                           inverse=picture.inverse, sizes=SIZES,
+                           palettes=PALETTES, id=id)
+
+
+@main.route('/<id>/share/', methods=['POST'])
+def share(id):
+    picture = Picture.query.get(id)
+    if not picture:
+        return "", 404
+    if picture.share_image:
+        return picture.share_image
+    size = app.config.get('SHARE_IMAGE_SIZE', 362)
+    f = request.files.get('file')
+    im = Image.open(f)
+    w_h = float(im.height) / im.width
+    im = im.resize((size, int(size * w_h)))
+    path = "static/share_images/" + id + ".jpg"
+    im.save(path)
+    picture.share_image = path
+    db.session.add(picture)
+    db.session.commit()
+    return "/" + path
 
 
 @app.errorhandler(404)

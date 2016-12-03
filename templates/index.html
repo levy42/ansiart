@@ -1,13 +1,19 @@
 {% extends "base.html" %}
 {% block head %}
     {{ super() }}
-    <meta property="og:image"
-          content="http://ansiart.online/static/img/einstein.png">
-    <script src="/static/js/share.js"></script>
-    <script type="text/javascript" src="https://vk.com/js/api/share.js?94"
-            charset="windows-1251"></script>
-    <link rel="image_src"
-          href="http://ansiart.online/static/img/einstein.png"/>
+    <script src="/static/vendor/js/bootstrap-filestyle.min.js"></script>
+    <script src="/static/vendor/js/html2canvas.js"></script>
+    <script src="/static/js/main.js"></script>
+    <style>
+        .share {
+            width: 20px;
+            height: 20px;
+        }
+
+        .share:hover {
+            margin-top: -7px;
+        }
+    </style>
 {% endblock %}
 {% block content %}
     <nav class="navbar navbar-default">
@@ -20,6 +26,18 @@
             <div class="collapse navbar-collapse"
                  id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a onclick="share('vk')">
+                            <img class="share" src="/static/img/vk.png"></a>
+                    </li>
+                    <li>
+                        <a onclick="share('fb')">
+                            <img class="share" src="/static/img/fb.png"></a>
+                    </li>
+                    <li>
+                        <a onclick="share('tw')">
+                            <img class="share" src="/static/img/tw.png"></a>
+                    </li>
                     <li class="dropdown">
                         <a class="nav-link dropdown-toggle"
                            data-toggle="dropdown">
@@ -29,9 +47,8 @@
                             aria-labelledby="navbarDropdownMenuLink">
                             {% for lang_code, lang in config.SUPPORTED_LANGUAGES.items() %}
                                 {% if  (session.lang_code or config['BABEL_DEFAULT_LOCALE'])!=lang_code %}
-                                    <li><a href="/{{ lang_code }}"><span
-                                            class="flag flag-{{ lang_code }}"></span> {{ lang }}
-                                    </a>
+                                    <li><a href="/{{ lang_code }}{% if id %}/{{ id }}/{% endif %}"><span
+                                            class="flag flag-{{ lang_code }}"></span> {{ lang }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
@@ -44,7 +61,7 @@
     <div class="container">
         <h4>{{ _('Tool for generating ANSI pictures from images') }}</h4>
         <form class="form-inline well" style="margin: 10px"
-              action="{{ '/%s/upload' % (session.lang_code or config['BABEL_DEFAULT_LOCALE']) }}"
+              action="."
               id="main"
               method="POST"
               enctype="multipart/form-data">
@@ -80,24 +97,20 @@
         </form>
         <div class="container"><img id="img" src="#"
                                     style="visibility: hidden; width: 150pt"
-                                    alt="Error, not image"/></div>
+                                    alt="{{ _('Error, not image') }}"/></div>
 
         <div class="container">
             {% if image and inverse %}
-                <h4>{{ _('Link to this picture') }}<a target="_blank"
-                                                      href="{{ "view/" + link + "?i" }}">
+                <h4>{{ _('Link to this picture') }}<a target="_blank" href=".">
                     {{ _('here') }}</a></h4>
-                {% if session.lang_code in ['ru','uk'] %}
-                    <span class="h4">{{ _('Share') }}:</span>
-                    <span id="vk_share_button"></span>
-                {% endif %}
-                <pre style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
+                <pre id="picture"
+                     style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
             {% endif %}
             {% if image and not inverse %}
                 <h4>{{ _('Link to this picture') }}<a target="_blank"
-                                                      href="{{ "view/" + link }}"> {{ _('here') }}</a>
+                                                      href="."> {{ _('here') }}</a>
                 </h4>
-                <pre style="font-size: x-small">{{ image }}</pre>
+                <pre id="picture" style="font-size: x-small">{{ image }}</pre>
             {% endif %}
         </div>
         {% if error %}

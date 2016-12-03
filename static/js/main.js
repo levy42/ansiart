@@ -1,3 +1,56 @@
+function share(destination) {
+    URL = window.location.href;
+    ROOT = window.location.origin;
+    VK_SHARE = "http://vkontakte.ru/share.php?url=" + URL + "&title=ANSI ART&image=" + ROOT;
+    FB_SHARE = "http://www.facebook.com/sharer.php?s=100&p[title]=ANSI ART&p[url]=" + ROOT;
+    TWITTER_SHARE = "http://twitter.com/share?text=ANSI ART&url=" + URL;
+    picture = document.getElementById("picture");
+    if (picture)
+        html2canvas(document.getElementById("picture"), {
+            onrendered: function (canvas) {
+                var dataURL = canvas.toDataURL();
+                var blobBin = atob(dataURL.split(',')[1]);
+                var array = [];
+                for (var i = 0; i < blobBin.length; i++) {
+                    array.push(blobBin.charCodeAt(i));
+                }
+                var file = new Blob([new Uint8Array(array)], {type: 'image/png'});
+
+
+                var formdata = new FormData();
+                formdata.append("file", file);
+                $.ajax({
+                    url: URL + "share/",
+                    type: "POST",
+                    data: formdata,
+                    processData: false,
+                    contentType: false,
+                    success: function (url, textStatus) {
+                        if (url) {
+                            if (destination == 'vk')
+                                window.location.href = VK_SHARE + url;
+                            if (destination == 'fb')
+                                window.location.href = FB_SHARE + url;
+                            if (destination == 'tw')
+                                window.location.href = TWITTER_SHARE;
+                        }
+                        else {
+                            alert("Sorry, error occurred")
+                        }
+                    }
+                })
+            }
+        });
+    else {
+        if (destination == 'vk')
+            window.location.href = VK_SHARE + "/static/img/einstein.png";
+        if (destination == 'fb')
+            window.location.href = FB_SHARE + "/static/img/einstein.png";
+        if (destination == 'tw')
+            window.location.href = TWITTER_SHARE;
+    }
+}
+
 $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
     function readURL(input) {
@@ -18,3 +71,4 @@ $(document).ready(function () {
         readURL(this);
     })
 });
+
