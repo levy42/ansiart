@@ -1,10 +1,10 @@
 function share(destination) {
-    URL = window.location.href;
-    ROOT = window.location.origin;
-    VK_SHARE = "http://vkontakte.ru/share.php?url=" + URL + "&title=ANSI ART&image=" + ROOT;
-    FB_SHARE = "http://www.facebook.com/sharer.php?s=100&p[title]=ANSI ART&p[url]=" + ROOT;
-    TWITTER_SHARE = "http://twitter.com/share?text=ANSI ART&url=" + URL;
-    picture = document.getElementById("picture");
+    var URL = window.location.href;
+    var ROOT = window.location.origin;
+    var VK_SHARE = "http://vkontakte.ru/share.php?url=" + URL + "&title=ANSI ART&image=" + ROOT;
+    var FB_SHARE = "http://www.facebook.com/sharer.php?s=100&p[title]=ANSI ART&p[url]=" + ROOT;
+    var TWITTER_SHARE = "http://twitter.com/share?text=ANSI ART&url=" + URL;
+    var picture = document.getElementById("picture");
     if (picture)
         html2canvas(document.getElementById("picture"), {
             onrendered: function (canvas) {
@@ -25,14 +25,21 @@ function share(destination) {
                     data: formdata,
                     processData: false,
                     contentType: false,
-                    success: function (url, textStatus) {
-                        if (url) {
+                    success: function (image_url, textStatus) {
+                        if (image_url) {
+                            var url = "";
                             if (destination == 'vk')
-                                window.location.href = VK_SHARE + url;
+                                url = VK_SHARE + image_url;
                             if (destination == 'fb')
-                                window.location.href = FB_SHARE + url;
+                                url = FB_SHARE + image_url;
                             if (destination == 'tw')
-                                window.location.href = TWITTER_SHARE;
+                                url = TWITTER_SHARE;
+                            var win = window.open(url, '_blank');
+                            if (win) {
+                                win.focus();
+                            } else {
+                                alert('Please allow popups for this website');
+                            }
                         }
                         else {
                             alert("Sorry, error occurred")
@@ -42,12 +49,19 @@ function share(destination) {
             }
         });
     else {
+        var url = "";
         if (destination == 'vk')
-            window.location.href = VK_SHARE + "/static/img/einstein.png";
+            url = VK_SHARE + "/static/img/einstein.png";
         if (destination == 'fb')
-            window.location.href = FB_SHARE + "/static/img/einstein.png";
+            url = FB_SHARE + "/static/img/einstein.png";
         if (destination == 'tw')
-            window.location.href = TWITTER_SHARE;
+            url = TWITTER_SHARE;
+        var win = window.open(url, '_blank');
+        if (win) {
+            win.focus();
+        } else {
+            alert('Please allow popups for this website');
+        }
     }
 }
 

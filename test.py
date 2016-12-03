@@ -1,8 +1,14 @@
 import argparse
 import os.path
+from PIL import Image
+import time
 
-print os.path.join("maprfs://" +
-                   (None or "/dir2"))
+s= time.time()
+im = Image.open("static/share_images/e.jpg")
+w_h = float(im.height) / im.width
+im = im.resize((200, int(200 * w_h)),resample=Image.LANCZOS)
+im.save("static/share_images/e2.jpg")
+print(time.time() - s)
 # a = 1
 # b = 2
 # c = 5

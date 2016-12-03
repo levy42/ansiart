@@ -139,11 +139,11 @@ def share(id):
         return "", 404
     if picture.share_image:
         return picture.share_image
-    size = app.config.get('SHARE_IMAGE_SIZE', 362)
+    size = app.config.get('SHARE_IMAGE_SIZE', 562)
     f = request.files.get('file')
     im = Image.open(f)
     w_h = float(im.height) / im.width
-    im = im.resize((size, int(size * w_h)))
+    im = im.resize((size, int(size * w_h)), resample=Image.LANCZOS)
     path = "static/share_images/" + id + ".jpg"
     im.save(path)
     picture.share_image = path
