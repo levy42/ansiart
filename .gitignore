@@ -90,3 +90,6 @@ ENV/
 
 # idea
 .idea/*
+
+# db
+.db
