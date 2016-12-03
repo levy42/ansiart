@@ -3,3 +3,4 @@ Flask-Babel2
 Flask-Cache
 Flask-SQLAlchemy
 Pillow>=3.3.0
+Flask-Script
