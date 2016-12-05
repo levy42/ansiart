@@ -3,7 +3,7 @@ import json
 import logging
 import uuid
 from flask import Flask, Blueprint
-from flask import render_template, request, session, redirect
+from flask import render_template, request, session, redirect, abort
 from flask_cache import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_babel import Babel, _
@@ -56,22 +56,20 @@ def get_locale():
     return session.get('lang_code', app.config['BABEL_DEFAULT_LOCALE'])
 
 
-@app.url_value_preprocessor
+@main.url_value_preprocessor
 def get_lang_code(endpoint, values):
-    if endpoint == 'static':
-        return
     if values is not None:
         lang_code = values.get('lang_code', None)
         session['redirected'] = lang_code is not None
         if lang_code in app.config['SUPPORTED_LANGUAGES'].keys():
             session['lang_code'] = lang_code
             values.pop('lang_code')
+        elif lang_code:
+            abort(404)
 
 
-@app.before_request
+@main.before_request
 def locale_redirect():
-    if request.script_root in ["/static"]:
-        return
     if not session.get('redirected') and session.get('lang_code'):
         session['redirected'] = True
         return redirect(
@@ -166,5 +164,5 @@ if __name__ == '__main__':
     LOG.info(_("ANSIART Started!!!"))
     app.register_blueprint(main, url_prefix="/<lang_code>")
     app.register_blueprint(main)
-    app.run(port=app.config.get('PORT') or 4000,
+    app.run(port=app.config.get('PORT') or 4004,
             host=app.config.get('HOST') or '0.0.0.0')
