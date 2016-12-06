@@ -53,7 +53,7 @@ SIZES = [('M', 70), ('XS', 30), ('S', 50), ('L', 90),
 
 @babel.localeselector
 def get_locale():
-    return g.get('lang_code', app.config['BABEL_DEFAULT_LOCALE'])
+    return g.get('lang_code') or app.config['BABEL_DEFAULT_LOCALE']
 
 
 @main.url_value_preprocessor
@@ -71,32 +71,10 @@ def ensure_lang_support():
 
 @main.url_defaults
 def set_language_code(endpoint, values):
-    if g.get('lang_code') in values or not g.get('lang_code',
-                                                             None):
+    if g.get('lang_code') in values or not g.get('lang_code', None):
         return
     if app.url_map.is_endpoint_expecting(endpoint, 'lang_code'):
         values['lang_code'] = g.get('lang_code')
-
-
-# @main.url_value_preprocessor
-# def get_lang_code(endpoint, values):
-#     if values is not None:
-#         lang_code = values.get('lang_code', None)
-#         session['redirected'] = lang_code is not None
-#         if lang_code in app.config['SUPPORTED_LANGUAGES'].keys():
-#             session['lang_code'] = lang_code
-#             values.pop('lang_code')
-#         elif lang_code:
-#             abort(404)
-#
-#
-# @main.before_request
-# def locale_redirect():
-#     if not session.get('redirected') and session.get('lang_code'):
-#         session['redirected'] = True
-#         return redirect(
-#                 "/%s%s" % (session.get('lang_code') or "",
-#                            request.path if request.path != "/" else ""))
 
 
 @main.route('/', methods=['GET', 'POST'])
