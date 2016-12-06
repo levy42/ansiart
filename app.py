@@ -3,7 +3,7 @@ import json
 import logging
 import uuid
 from flask import Flask, Blueprint
-from flask import render_template, request, session, redirect, abort
+from flask import render_template, request, session, redirect, abort, g
 from flask_cache import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_babel import Babel, _
@@ -53,28 +53,49 @@ SIZES = [('M', 70), ('XS', 30), ('S', 50), ('L', 90),
 
 @babel.localeselector
 def get_locale():
-    return session.get('lang_code', app.config['BABEL_DEFAULT_LOCALE'])
+    return g.get('lang_code', app.config['BABEL_DEFAULT_LOCALE'])
 
 
 @main.url_value_preprocessor
 def get_lang_code(endpoint, values):
     if values is not None:
-        lang_code = values.get('lang_code', None)
-        session['redirected'] = lang_code is not None
-        if lang_code in app.config['SUPPORTED_LANGUAGES'].keys():
-            session['lang_code'] = lang_code
-            values.pop('lang_code')
-        elif lang_code:
-            abort(404)
+        g.lang_code = values.pop('lang_code', None)
 
 
 @main.before_request
-def locale_redirect():
-    if not session.get('redirected') and session.get('lang_code'):
-        session['redirected'] = True
-        return redirect(
-                "/%s%s" % (session.get('lang_code') or "",
-                           request.path if request.path != "/" else ""))
+def ensure_lang_support():
+    lang_code = g.get('lang_code', None)
+    if lang_code and lang_code not in app.config['SUPPORTED_LANGUAGES'].keys():
+        return abort(404)
+
+
+@main.url_defaults
+def set_language_code(endpoint, values):
+    if 'lang_code' in values or not g.get('lang_code', None):
+        return
+    if app.url_map.is_endpoint_expecting(endpoint, 'lang_code'):
+        values['lang_code'] = g.lang_code
+
+
+# @main.url_value_preprocessor
+# def get_lang_code(endpoint, values):
+#     if values is not None:
+#         lang_code = values.get('lang_code', None)
+#         session['redirected'] = lang_code is not None
+#         if lang_code in app.config['SUPPORTED_LANGUAGES'].keys():
+#             session['lang_code'] = lang_code
+#             values.pop('lang_code')
+#         elif lang_code:
+#             abort(404)
+#
+#
+# @main.before_request
+# def locale_redirect():
+#     if not session.get('redirected') and session.get('lang_code'):
+#         session['redirected'] = True
+#         return redirect(
+#                 "/%s%s" % (session.get('lang_code') or "",
+#                            request.path if request.path != "/" else ""))
 
 
 @main.route('/', methods=['GET', 'POST'])
