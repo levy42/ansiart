@@ -3,7 +3,7 @@ import json
 import logging
 import uuid
 from flask import Flask, Blueprint
-from flask import render_template, request, session, redirect, abort, g
+from flask import render_template, request, redirect, abort, g
 from flask_cache import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_babel import Babel, _
@@ -71,10 +71,11 @@ def ensure_lang_support():
 
 @main.url_defaults
 def set_language_code(endpoint, values):
-    if 'lang_code' in values or not g.get('lang_code', None):
+    if g.get('lang_code') in values or not g.get('lang_code',
+                                                             None):
         return
     if app.url_map.is_endpoint_expecting(endpoint, 'lang_code'):
-        values['lang_code'] = g.lang_code
+        values['lang_code'] = g.get('lang_code')
 
 
 # @main.url_value_preprocessor
@@ -185,5 +186,5 @@ if __name__ == '__main__':
     LOG.info(_("ANSIART Started!!!"))
     app.register_blueprint(main, url_prefix="/<lang_code>")
     app.register_blueprint(main)
-    app.run(port=app.config.get('PORT') or 4004,
+    app.run(port=app.config.get('PORT') or 4000,
             host=app.config.get('HOST') or '0.0.0.0')

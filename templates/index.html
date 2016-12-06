@@ -19,9 +19,9 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a href="/"> <img href="/{{ session.lang_code or "" }}" alt="Brand"
-                                  style="height: 25px; margin-top: 10px"
-                                  src="/static/img/logo.png"></a>
+                <a href="/"><img href="." alt="Brand"
+                                 style="height: 25px; margin-top: 10px"
+                                 src="/static/img/logo.png"></a>
             </div>
             <div class="collapse navbar-collapse"
                  id="bs-example-navbar-collapse-1">
@@ -41,14 +41,15 @@
                     <li class="dropdown">
                         <a class="nav-link dropdown-toggle"
                            data-toggle="dropdown">
-                            {{ (session.lang_code or config['BABEL_DEFAULT_LOCALE']) }}
+                            {{ (g.lang_code or config['BABEL_DEFAULT_LOCALE']) }}
                         </a>
                         <ul class="dropdown-menu"
                             aria-labelledby="navbarDropdownMenuLink">
                             {% for lang_code, lang in config.SUPPORTED_LANGUAGES.items() %}
-                                {% if  (session.lang_code or config['BABEL_DEFAULT_LOCALE'])!=lang_code %}
-                                    <li><a href="/{{ lang_code }}{% if id %}/{{ id }}/{% endif %}"><span
-                                            class="flag flag-{{ lang_code }}"></span> {{ lang }}</a>
+                                {% if  (g.lang_code or config['BABEL_DEFAULT_LOCALE'])!=lang_code %}
+                                    <li><a href="/{{ lang_code }}/{% if id %}{{ id }}/{% endif %}"><span
+                                            class="flag flag-{{ lang_code }}"></span> {{ lang }}
+                                    </a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
@@ -61,7 +62,7 @@
     <div class="container">
         <h4>{{ _('Tool for generating ANSI pictures from images') }}</h4>
         <form class="form-inline well" style="margin: 10px"
-              action="."
+              action="/{{ g.lang_code + '/' if g.lang_code  or "" }}"
               id="main"
               method="POST"
               enctype="multipart/form-data">
@@ -104,13 +105,14 @@
                 <h4>{{ _('Link to this picture') }}<a target="_blank" href=".">
                     {{ _('here') }}</a></h4>
                 <pre id="picture"
-                     style=" font-size: x-small;background: black; color: white">{{ image }}</pre>
+                     style=" font-size: x-small;background: black; color: white;display: inline-block">{{ image }}</pre>
             {% endif %}
             {% if image and not inverse %}
                 <h4>{{ _('Link to this picture') }}<a target="_blank"
                                                       href="."> {{ _('here') }}</a>
                 </h4>
-                <pre id="picture" style="font-size: x-small">{{ image }}</pre>
+                <pre id="picture"
+                     style="font-size: x-small;display: inline-block">{{ image }}</pre>
             {% endif %}
         </div>
         {% if error %}
