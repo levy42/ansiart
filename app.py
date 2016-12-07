@@ -60,12 +60,9 @@ def get_locale():
 def get_lang_code(endpoint, values):
     if values is not None:
         g.lang_code = values.pop('lang_code', None)
-
-
-@main.before_request
-def ensure_lang_support():
-    lang_code = g.get('lang_code', None)
-    if lang_code and lang_code not in app.config['SUPPORTED_LANGUAGES'].keys():
+    if g.lang_code and g.lang_code not in app.config[
+        'SUPPORTED_LANGUAGES'].keys():
+        g.lang_code = None
         return abort(404)
 
 
@@ -107,8 +104,8 @@ def index():
             return redirect("/%s/%s" % (get_locale(), id))
         except Exception as e:
             LOG.error(
-                    _("Failed to create ANSI picture. Reason: %(error)s",
-                      error=e))
+                _("Failed to create ANSI picture. Reason: %(error)s",
+                  error=e))
             error = _("Failed to create ANSI picture. Check your image file")
             return render_template("index.html", sizes=SIZES,
                                    palettes=PALETTES, error=error)
