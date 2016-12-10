@@ -1,0 +1,110 @@
+article {
+    margin-right: 7%;
+    margin-left: 7%;
+}
+
+h1, h2, h3 {
+    display: inline-block;
+    font-size: x-large;
+}
+
+form {
+    background: #ffffff;
+    border-radius: 3px;
+    align-content: center;
+    padding: 1%;
+    box-shadow: inset 0 0 2px #a3a3a3;
+    margin-bottom: 10px;
+}
+
+form div {
+    display: inline-block;
+}
+
+select {
+    background: white;
+    font-size: 1rem;
+    height: 2rem;
+}
+
+label {
+    font-size: larger;
+    font-weight: 700;
+    margin-left: 20px;
+}
+
+img {
+    border-radius: 5px;
+    max-height: 300pt;
+}
+
+.share, h1, h2, h3 {
+    margin-top: 20px;
+}
+
+.error {
+    background: #ffe1dd;
+    color: #e15b5a;
+    padding: 0.5rem;
+    border-radius: 3px;
+}
+
+.palette_text {
+    max-height: 20%;
+}
+
+.share {
+    margin-left: 2px;
+    width: 2rem;
+    height: 2rem;
+    float: right;
+    background-size: 25px 25px;
+    margin-top: 1rem;
+}
+
+.share:hover {
+    margin-top: 0.9rem;
+}
+
+.logo {
+    color: #e15b5a;
+    font-weight: bold;
+}
+
+.submit {
+    display: inline-block;
+    background: #e96562;
+    font-weight: normal;
+    text-align: center;
+    cursor: pointer;
+    color: white;
+    border: 1px solid transparent;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 3px;
+
+}
+
+.submit:hover {
+    background: #d65d5a;
+}
+
+label.file input[type="file"] {
+    position: fixed;
+    top: -1000px;
+}
+
+.file {
+    display: inline-block;
+    border: 2px dashed #acacac;
+    border-radius: 3px;
+    padding: 0.5rem;
+}
+
+.file span:hover {
+    color: #e96562;
+}
+
+.file:active {
+    background: #ffffff;
+}
