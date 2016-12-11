@@ -1,12 +1,19 @@
 # ansiart
 ### Tool for generating ANSI pictures from images.
-[ansiart.online](http://ansiart.online/)
+[ansiart.online](http://simple.ansiart.online/)
 
-To run web application:
- ```sh
-$ python web.py
+There is no backend, just pure html, js and css. No bootstrap, no jquery.
+
+Try to run it:
+
 ```
-Several palettes are supported, you can add custom palettes in **palette.json**
+$ python -m SimpleHTTPServer
+```
+
+Profit!
+##### Also:
+
+Several palettes are supported, but can add custom palettes modifying script.js
 
 #### Enjoy!!!
 

@@ -20,20 +20,13 @@ label {
     margin-left: 20px;
 }
 
-canvas {
+#img {
     border-radius: 5px;
     max-height: 300pt;
 }
 
 .share, h1, h2, h3 {
     margin-top: 20px;
-}
-
-.error {
-    background: #ffe1dd;
-    color: #e15b5a;
-    padding: 0.5rem;
-    border-radius: 3px;
 }
 
 .palette_text {
@@ -76,6 +69,10 @@ canvas {
     background: #d65d5a;
 }
 
+.submit:disabled {
+    background: #ffdbd4;
+}
+
 label.file input[type="file"] {
     position: fixed;
     top: -1000px;
@@ -103,6 +100,15 @@ label.file input[type="file"] {
 
 #palette_text {
     display: inline-block;
+}
+
+#error {
+    background: #fff0ed;
+    color: #d65d5a;
+    padding: 0.5rem;
+    border-radius: 3px;
+    display: none;
+    box-shadow: inset 0 0 1px #f68784;
 }
 
 .form {
