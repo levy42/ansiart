@@ -1,17 +1,17 @@
 SIZES = {'M': 70, 'XS': 30, 'S': 50, 'L': 90, 'XL': 120};
 PALLETES = {
-    "Default": ['  ', '. ', '..', '.-', '--', '-+', '++', '**', 'HH', 'H#', '##'],
-    "Simple": ["  ", ". ", "..", "--", "-+"],
-    "Dual": ["  ", "##"],
-    "Rosa": ["  ", "' ", "''", "..", "::", "**", "@@"],
-    "Oval": ["  ", " °", "°°", ",,", "••", "©©", "®®", "ØØ", "¶¶"],
-    "Numbers": ["  ", "1 ", "11", "77", "55", "00", "88"],
-    "Violetta": ["  ", "v ", "V ", "Vv", "VV", "WV", "WW"],
-    "(-|-)": ["  ", " -", "--", "-=", "==", "##"]
+    ". .. - + * H #": ['  ', '. ', '..', '.-', '--', '-+', '++', '**', 'HH', 'H#', '##'],
+    ". .. - +": ["  ", ". ", "..", "--", "-+"],
+    "#": ["  ", "##"],
+    "' . : * @": ["  ", "' ", "''", "..", "::", "**", "@@"],
+    "° , • © ® Ø ¶": ["  ", " °", "°°", ",,", "••", "©©", "®®", "ØØ", "¶¶"],
+    "1 5 7 0 8": ["  ", "1 ", "11", "77", "55", "00", "88"],
+    "v V W": ["  ", "v ", "V ", "Vv", "VV", "WV", "WW"],
+    "- = #": ["  ", " -", "--", "-=", "==", "##"]
 };
 
 
-function create(palette_name, size_code, inverse, source) {
+function create(palette_name, size_code, inverse, source, contrast) {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
     var dv = source.width / SIZES[size_code];
@@ -25,11 +25,17 @@ function create(palette_name, size_code, inverse, source) {
         palette.push(palette[palette.length - 1]);
     }
     var shadowStep = 255 / (palette.length - 1);
+    var factor = (256 * (contrast + 255)) / (255 * (256 - contrast));
     var text = "";
     for (var i = 0; i < canvas.width / dv; i++) {
         for (var j = 0; j < canvas.height / dv; j++) {
-            var pixel = context.getImageData(j, i, 1, 1).data;
-            var value = (pixel[0] + pixel[1] + pixel[2]) / 3;
+            var p = context.getImageData(j, i, 1, 1).data;
+            var value = (p[0] + p[1] + p[2]) / 3;
+            value = factor * (value - 128) + 128;
+            if (value < 0)
+                value = 0;
+            if (value > 255)
+                value = 255;
             text += palette[~~(value / shadowStep)];
         }
         text += '\n'
@@ -46,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
     for (key in PALLETES) {
         option = document.createElement("option");
         option.text = key;
-        option.setAttribute('about', PALLETES[key].join(" "));
         $("palette").add(option);
     }
     $("file").addEventListener("change", function (e) {
@@ -57,20 +62,13 @@ document.addEventListener('DOMContentLoaded', function () {
         reader.readAsDataURL(e.target.files[0]);
         $("submit").disabled = false;
     });
-    function setPalette() {
-        $("palette_text").innerHTML = $("palette").options[$("palette").selectedIndex].getAttribute("about")
-    }
 
-    setPalette();
-    $("palette").addEventListener("change", function (e) {
-        setPalette()
-    });
     $("submit").addEventListener("click", function (e) {
         var size = $("size").options[$("size").selectedIndex].text;
         var palette = $("palette").options[$("palette").selectedIndex].text;
         var is_inversed = $("inv").checked;
         try {
-            var text = create(palette, size, is_inversed, $("img"));
+            var text = create(palette, size, is_inversed, $("img"), parseInt($("range").value));
             if (is_inversed) {
                 $("text").style.color = "#FFFFFF";
                 $("text").style.background = "#000000";

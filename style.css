@@ -11,7 +11,8 @@ h1, h2, h3 {
 select {
     background: white;
     font-size: 1rem;
-    height: 2rem;
+    height: 2.25rem;
+    margin-left: 1rem;
 }
 
 label {
@@ -23,6 +24,9 @@ label {
 #img {
     border-radius: 5px;
     max-height: 300pt;
+    float: left;
+    margin-top: 1rem;
+    margin-right: 1rem;
 }
 
 .share, h1, h2, h3 {
@@ -40,6 +44,7 @@ label {
     float: right;
     background-size: 25px 25px;
     margin-top: 1rem;
+    border-radius: 10px;
 }
 
 .share:hover {
@@ -96,6 +101,7 @@ label.file input[type="file"] {
 #text {
     font-size: x-small;
     display: inline-block;
+    margin-top: 1rem;
 }
 
 #palette_text {
