@@ -94,14 +94,11 @@ label.file input[type="file"] {
     color: #e96562;
 }
 
-.file:active {
-    background: #ffffff;
-}
-
 #text {
-    font-size: x-small;
     display: inline-block;
     margin-top: 1rem;
+    font-size: 10px;
+    line-height: 12px;
 }
 
 #palette_text {
