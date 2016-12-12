@@ -15,10 +15,9 @@ function create(palette_name, size_code, inverse, source, contrast) {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
     var dv = source.width / SIZES[size_code];
-    canvas.width = source.width;
-    canvas.height = source.height;
-    context.scale(1 / dv, 1 / dv);
-    context.drawImage(source, 0, 0);
+    canvas.width = source.width/dv;
+    canvas.height = source.height/dv;
+    context.drawImage(source, 0, 0, canvas.width, canvas.height);
     var palette = PALLETES[palette_name].slice();
     if (!inverse) {
         palette = palette.reverse();
@@ -27,8 +26,8 @@ function create(palette_name, size_code, inverse, source, contrast) {
     var shadowStep = 255 / (palette.length - 1);
     var factor = (256 * (contrast + 255)) / (255 * (256 - contrast));
     var text = "";
-    for (var i = 0; i < canvas.width / dv; i++) {
-        for (var j = 0; j < canvas.height / dv; j++) {
+    for (var i = 0; i < canvas.height; i++) {
+        for (var j = 0; j < canvas.width; j++) {
             var p = context.getImageData(j, i, 1, 1).data;
             var value = (p[0] + p[1] + p[2]) / 3;
             value = factor * (value - 128) + 128;
