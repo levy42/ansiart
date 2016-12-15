@@ -4,10 +4,11 @@ PALLETES = {
     ". .. - +": ["  ", ". ", "..", "--", "-+"],
     "#": ["  ", "##"],
     "' . : * @": ["  ", "' ", "''", "..", "::", "**", "@@"],
-    "° , • © ® Ø ¶": ["  ", " °", "°°", ",,", "••", "©©", "®®", "ØØ", "¶¶"],
+    "° , • © ® Ø ¶": ["  ", " :", ",,", "••", "©©", "®®", "ØØ", "¶¶"],
     "1 5 7 0 8": ["  ", "1 ", "11", "77", "55", "00", "88"],
     "v V W": ["  ", "v ", "V ", "Vv", "VV", "WV", "WW"],
-    "- = #": ["  ", " -", "--", "-=", "==", "##"]
+    "- = #": ["  ", " -", "--", "-=", "==", "##"],
+    "| ^ X Ж":["  ", " |", "^|", "||", "X|", "XX"]
 };
 
 
@@ -15,8 +16,8 @@ function create(palette_name, size_code, inverse, source, contrast) {
     var canvas = document.createElement('canvas');
     var context = canvas.getContext('2d');
     var dv = source.width / SIZES[size_code];
-    canvas.width = source.width/dv;
-    canvas.height = source.height/dv;
+    canvas.width = source.width / dv;
+    canvas.height = source.height / dv;
     context.drawImage(source, 0, 0, canvas.width, canvas.height);
     var palette = PALLETES[palette_name].slice();
     if (!inverse) {

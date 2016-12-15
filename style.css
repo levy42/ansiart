@@ -29,22 +29,19 @@ label {
     margin-right: 1rem;
 }
 
-.share, h1, h2, h3 {
-    margin-top: 20px;
-}
-
 .palette_text {
     max-height: 20%;
 }
 
 .share {
     margin-left: 2px;
-    width: 2rem;
-    height: 2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    padding: 0.5rem;
     float: right;
-    background-size: 25px 25px;
     margin-top: 1rem;
-    border-radius: 10px;
+    border: solid 1px #aeaeae;
+    border-radius: 3rem;
 }
 
 .share:hover {
@@ -101,10 +98,6 @@ label.file input[type="file"] {
     line-height: 12px;
 }
 
-#palette_text {
-    display: inline-block;
-}
-
 #error {
     background: #fff0ed;
     color: #d65d5a;
@@ -115,14 +108,11 @@ label.file input[type="file"] {
 }
 
 .form {
-    background: #ffffff;
     border-radius: 3px;
-    align-content: center;
-    padding: 1%;
+    padding: 0.75rem;
     box-shadow: inset 0 0 2px #a3a3a3;
-    margin-bottom: 10px;
 }
 
-.form div {
+.form div, #palette_text {
     display: inline-block;
 }
