@@ -2,15 +2,15 @@ SIZES = {'M': 70, 'XS': 30, 'S': 50, 'L': 90, 'XL': 120};
 PALLETES = {
     ". .. - + * H #": ['  ', '. ', '..', '.-', '--', '-+', '++', '**', 'HH', 'H#', '##'],
     ". .. - +": ["  ", ". ", "..", "--", "-+"],
-    "#": ["  ", "##"],
     "' . : * @": ["  ", "' ", "''", "..", "::", "**", "@@"],
     "° , • © ® Ø ¶": ["  ", " :", ",,", "••", "©©", "®®", "ØØ", "¶¶"],
     "1 5 7 0 8": ["  ", "1 ", "11", "77", "55", "00", "88"],
     "v V W": ["  ", "v ", "V ", "Vv", "VV", "WV", "WW"],
     "- = #": ["  ", " -", "--", "-=", "==", "##"],
-    "| ^ X Ж":["  ", " |", "^|", "||", "X|", "XX"]
+    "| ^ X": ["  ", " |", "^|", "||", "X|", "XX"]
 };
 
+var ROOT = window.location.origin;
 
 function create(palette_name, size_code, inverse, source, contrast) {
     var canvas = document.createElement('canvas');
@@ -42,7 +42,7 @@ function create(palette_name, size_code, inverse, source, contrast) {
     }
     return text
 }
-// setup
+
 document.addEventListener('DOMContentLoaded', function () {
     for (key in SIZES) {
         option = document.createElement("option");
@@ -69,13 +69,10 @@ document.addEventListener('DOMContentLoaded', function () {
         var is_inversed = $("inv").checked;
         try {
             var text = create(palette, size, is_inversed, $("img"), parseInt($("range").value));
-            if (is_inversed) {
-                $("text").style.color = "#FFFFFF";
-                $("text").style.background = "#000000";
-            } else {
-                $("text").style.color = "#000000";
-                $("text").style.background = "#FFFFFF";
-            }
+            if (is_inversed)
+                $("text").classList.add('inverse');
+            else
+                $("text").classList.remove('inverse');
             $("text").innerHTML = text;
         }
         catch (err) {
@@ -83,6 +80,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
 function $(id) {
     return document.getElementById(id)
+}
+
+function share(dest) {
+    if (dest == 'vk') {
+        window.location.href = "http://vkontakte.ru/share.php?url=" + ROOT + "&title=ANSIART&image=" + ROOT + "/img/einstein.png"
+    }
+    if (dest == 'fb') {
+        window.location.href = "http://www.facebook.com/sharer.php?s=100&p[title]=ANSIART&p[url]=" + ROOT + "&p[images][0]=" + ROOT + "/img/einstein.png"
+    }
+    if (dest == "tw") {
+        window.location.href = "http://twitter.com/share?url=" + ROOT + "&test=ANSIART"
+    }
 }
